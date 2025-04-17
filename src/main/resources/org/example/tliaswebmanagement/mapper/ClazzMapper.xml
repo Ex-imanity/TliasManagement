@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.example.tliaswebmanagement.mapper.ClazzMapper">
+    <insert id="insert">
+        insert into clazz(name, room, begin_date, end_date, master_id, subject, create_time, update_time)
+        values (#{name}, #{room}, #{beginDate}, #{endDate}, #{masterId}, #{subject}, #{createTime}, #{updateTime})
+    </insert>
+
+    <update id="update">
+        update clazz
+        <set>
+            <if test="name != null and name != ''">
+                name = #{name},
+            </if>
+            <if test="room != null and room != ''">
+                room = #{room},
+            </if>
+            <if test="beginDate != null">
+                begin_date = #{beginDate},
+            </if>
+            <if test="endDate != null">
+                end_date = #{endDate},
+            </if>
+            <if test="subject != null">
+                subject = #{subject},
+            </if>
+            <if test="updateTime != null">
+                update_time = #{updateTime},
+            </if>
+            <if test="masterId != null">
+                master_id = #{masterId},
+            </if>
+            <if test="masterName != null">
+                master_name = #{masterName},
+            </if>
+        </set>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteById">
+        delete from clazz where id = #{id}
+    </delete>
+
+    <select id="list" resultType="org.example.tliaswebmanagement.pojo.Clazz">
+        select c.* , e.name master_name from clazz c left join emp e on c.master_id = e.id
+        <where>
+            <if test="name != null and name != ''">
+                c.name like concat('%',#{name},'%')
+            </if>
+            <if test="begin != null and end != null">
+                and c.create_time between#{begin} and #{end}
+            </if>
+        </where>
+        order by c.update_time desc
+    </select>
+
+    <select id="findAll" resultType="org.example.tliaswebmanagement.pojo.Clazz">
+        select c.* , e.name master_name from clazz c left join emp e on c.master_id = e.id order by update_time desc;
+    </select>
+
+    <select id="getById" resultType="org.example.tliaswebmanagement.pojo.Clazz">
+        select * from clazz where id = #{id}
+    </select>
+</mapper>

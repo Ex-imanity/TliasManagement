@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.example.tliaswebmanagement.mapper.StudentMapper">
+    <insert id="insert">
+        insert into student(name, no, gender, phone, id_card, is_college, address, degree, graduation_date, clazz_id, violation_count, violation_score, create_time, update_time)
+        values (#{name}, #{no}, #{gender}, #{phone}, #{idCard}, #{isCollege}, #{address}, #{degree}, #{graduationDate}, #{clazzId}, #{violationCount}, #{violationScore}, #{createTime}, #{updateTime})
+    </insert>
+
+    <update id="update">
+        update student
+        <set>
+            <if test="name != null and name != ''">
+                name = #{name},
+            </if>
+            <if test="no != null and no != ''">
+                no = #{no},
+            </if>
+            <if test="gender != null">
+                gender = #{gender},
+            </if>
+            <if test="phone != null and phone != ''">
+                phone = #{phone},
+            </if>
+            <if test="idCard != null and idCard != ''">
+                id_card = #{idCard},
+            </if>
+            <if test="isCollege != null">
+                is_college = #{isCollege},
+            </if>
+            <if test="address != null and address != ''">
+                address = #{address},
+            </if>
+            <if test="degree != null">
+                degree = #{degree},
+            </if>
+            <if test="graduationDate != null">
+                graduation_date = #{graduationDate},
+            </if>
+            <if test="clazzId != null">
+                clazz_id = #{clazzId},
+            </if>
+            <if test="violationCount != null">
+                violation_count = #{violationCount},
+            </if>
+            <if test="violationScore != null">
+                violation_score = #{violationScore},
+            </if>
+            <if test="createTime != null">
+                create_time = #{createTime},
+            </if>
+            <if test="updateTime != null">
+                update_time = #{updateTime}
+            </if>
+        </set>
+        where id = #{id}
+    </update>
+
+    <update id="updateViolation">
+        update student set violation_count = violation_count + 1, violation_score = violation_score + #{score} where id = #{id}
+    </update>
+
+    <delete id="delete">
+        delete from student where id = #{id}
+    </delete>
+
+    <select id="countByClazzId" resultType="java.lang.Integer">
+        select count(*) from student where clazz_id = #{clazzId}
+    </select>
+
+    <select id="list" resultType="org.example.tliaswebmanagement.pojo.Student">
+        select s.*, c.name clazz_name from student s left join clazz c on s.clazz_id = c.id
+        <where>
+            <if test="name != null and name != ''">
+                and s.name like concat('%',#{name},'%')
+            </if>
+            <if test="clazzId != null">
+                and clazz_id = #{clazzId}
+            </if>
+            <if test="degree != null">
+                and degree = #{degree}
+            </if>
+        </where>
+        order by update_time desc
+    </select>
+
+    <select id="getById" resultType="org.example.tliaswebmanagement.pojo.Student">
+        select s.*, c.name clazz_name from student s left join clazz c on s.clazz_id = c.id where s.id = #{id}
+    </select>
+
+    <select id="countStudentData" resultType="java.util.Map">
+        select c.name cla, count(s.id) num from student s right join clazz c on s.clazz_id = c.id group by c.name
+    </select>
+
+    <select id="getStudentDegreeData" resultType="java.util.Map">
+        select(case degree
+            when 1 then '初中'
+            when 2 then '高中'
+            when 3 then '大专'
+            when 4 then '本科'
+            when 5 then '硕士'
+            when 6 then '博士'
+            end) name, count(id) value from student group by degree
+    </select>
+</mapper>
